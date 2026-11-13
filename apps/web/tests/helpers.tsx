@@ -12,11 +12,16 @@ interface SimulatedResponse {
 type Handler =
   SimulatedResponse | ((request: { body: any }) => SimulatedResponse | Promise<SimulatedResponse>);
 
+export const TASKS_LIST = 'GET /tasks?page=1&pageSize=100';
+export const emptyTasks = () => ({ tasks: [], total: 0, page: 1, pageSize: 100 });
+
 /**
  * Simula la API: cada clave es "MÉTODO /ruta". Así las pruebas de pantallas no necesitan
  * servidor ni base de datos. Una petición no prevista hace fallar la prueba (para notarlo).
  */
-export function mockApi(handlers: Record<string, Handler>) {
+export function mockApi(overrides: Record<string, Handler>) {
+  // Casi todas las pantallas privadas piden las tareas: por defecto, la lista llega vacía.
+  const handlers: Record<string, Handler> = { [TASKS_LIST]: { body: emptyTasks() }, ...overrides };
   const calls: Array<{ key: string; body: any }> = [];
 
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
