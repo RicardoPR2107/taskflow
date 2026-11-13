@@ -16,6 +16,7 @@
     "build": "npm run build -w @taskflow/web",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "npm run test:shared && npm run test:api && npm run test:web",
     "test:shared": "npm run test -w @taskflow/shared",
     "test:api": "npm run test -w @taskflow/api",
