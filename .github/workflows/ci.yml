@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Si subes un cambio nuevo mientras corre uno anterior de la misma rama, cancela el anterior.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Conexión al PostgreSQL temporal. Las pruebas derivan de aquí la base "taskflow_test".
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/taskflow
+
+jobs:
+  calidad:
+    name: Calidad
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate -w @taskflow/api
+      - name: Formato del código
+        run: npm run format:check
+      - name: Revisión de tipos
+        run: npm run typecheck
+      - name: Pruebas unitarias, de API y de componentes
+        run: npm test
+
+  e2e:
+    name: E2E
+    needs: calidad
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:generate -w @taskflow/api
+      - name: Instalar el navegador de pruebas
+        run: npx playwright install --with-deps chromium
+      - name: Pruebas de extremo a extremo
+        run: npm run test:e2e
+      - name: Guardar el reporte si algo falló
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-e2e
+          path: e2e/playwright-report
+          retention-days: 7

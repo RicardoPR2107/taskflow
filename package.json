@@ -1,0 +1,31 @@
+{
+  "name": "taskflow",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TaskFlow - aplicación de tareas con tablero Kanban y dashboard",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "e2e"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm run dev -w @taskflow/api\" \"npm run dev -w @taskflow/web\"",
+    "build": "npm run build -w @taskflow/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "format": "prettier --write .",
+    "test": "npm run test:shared && npm run test:api && npm run test:web",
+    "test:shared": "npm run test -w @taskflow/shared",
+    "test:api": "npm run test -w @taskflow/api",
+    "test:web": "npm run test -w @taskflow/web",
+    "test:e2e": "npm run db:test:prepare -w @taskflow/api && npm run test -w @taskflow/e2e",
+    "test:all": "npm run typecheck && npm run test && npm run test:e2e"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  }
+}

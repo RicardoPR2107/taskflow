@@ -1,0 +1,83 @@
+// Modelo de datos de TaskFlow (ver Figura 3 del documento de diseño).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// La URL de conexión NO va aquí: se define en prisma.config.ts (Prisma 7).
+datasource db {
+  provider = "postgresql"
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  name         String
+  passwordHash String
+  timezone     String   @default("America/Lima") // RN-10
+  theme        Theme    @default(LIGHT) // RF-28, RF-29
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  tasks               Task[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+model Task {
+  id          String       @id @default(uuid()) @db.Uuid
+  userId      String       @db.Uuid // RN-03: cada tarea pertenece a un único usuario
+  title       String       @db.VarChar(100) // RN-01, RN-02
+  description String?
+  status      TaskStatus   @default(PENDING)
+  priority    TaskPriority @default(MEDIUM) // RN-07
+  dueDate     DateTime?    @db.Date // solo fecha, sin hora (RN-06, RN-10)
+  completedAt DateTime?    @db.Timestamptz(3) // RN-04, RN-05
+  createdAt   DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime     @updatedAt @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Todas las consultas filtran primero por usuario.
+  @@index([userId, status])
+  @@index([userId, dueDate])
+  @@index([userId, priority])
+  @@map("tasks")
+}
+
+// Enlaces de recuperación de contraseña (RF-33).
+// Se guarda solo el HASH del token: si alguien leyera la base de datos, no podría usar los enlaces.
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique // SHA-256 del token que viaja en el enlace
+  expiresAt DateTime  @db.Timestamptz(3)
+  usedAt    DateTime? @db.Timestamptz(3) // se llena al usarlo: un enlace sirve una sola vez
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
