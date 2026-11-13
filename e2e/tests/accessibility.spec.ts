@@ -1,7 +1,7 @@
 /** E2E: auditoría automática de accesibilidad con axe-core, nivel WCAG 2.1 AA (RNF-10). */
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { DEMO, login } from './support';
+import { DEMO, login, register } from './support';
 
 const audit = async (page: import('@playwright/test').Page) => {
   const results = await new AxeBuilder({ page })
@@ -40,6 +40,34 @@ test.describe('TC-E2E-A11Y: accesibilidad', () => {
     await page.getByRole('button', { name: 'Iniciar sesión' }).click();
     await expect(page.getByText('Ingresa un correo válido')).toBeVisible();
 
+    expect(await audit(page)).toEqual([]);
+  });
+
+  test('TC-E2E-A11Y-03 el tablero con tareas y sus ventanas: sin violaciones WCAG 2.1 AA', async ({
+    page,
+  }) => {
+    await register(page);
+    for (const [title, priority] of [
+      ['Tarea urgente', 'Urgente'],
+      ['Tarea alta', 'Alta'],
+      ['Tarea baja', 'Baja'],
+    ]) {
+      await page.getByRole('button', { name: 'Nueva tarea' }).first().click();
+      await page.getByLabel('Título').fill(title!);
+      await page.getByLabel('Prioridad').selectOption({ label: priority });
+      await page.getByLabel('Fecha límite (opcional)').fill('2020-01-01');
+      await page.getByRole('button', { name: 'Crear tarea' }).click();
+      await expect(page.getByText(title!, { exact: true })).toBeVisible();
+    }
+    expect(await audit(page)).toEqual([]);
+
+    await page.getByRole('button', { name: 'Editar tarea: Tarea alta' }).click();
+    await expect(page.getByRole('dialog', { name: 'Editar tarea' })).toBeVisible();
+    expect(await audit(page)).toEqual([]);
+    await page.getByRole('button', { name: 'Cancelar' }).click();
+
+    await page.getByRole('button', { name: 'Eliminar tarea: Tarea alta' }).click();
+    await expect(page.getByRole('dialog', { name: '¿Eliminar esta tarea?' })).toBeVisible();
     expect(await audit(page)).toEqual([]);
   });
 });

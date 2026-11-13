@@ -10,7 +10,7 @@
 
 Aplicación web full stack para gestionar tareas personales con un tablero Kanban y un dashboard de productividad. Es un proyecto de portafolio para practicar diseño de interfaces, lógica de negocio, seguridad y pruebas automatizadas.
 
-> 🚧 **Estado:** en desarrollo. Ya funcionan el registro, el inicio de sesión y la recuperación de contraseña. Las tareas, el tablero y el dashboard son lo siguiente.
+> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas y la gestión de tareas. El arrastre en el tablero, los filtros y el dashboard son lo siguiente.
 
 ## 📦 Tecnologías
 
@@ -27,8 +27,11 @@ Lo que ya puede hacer el usuario:
 - **Crear una cuenta** con una contraseña segura (mínimo 10 caracteres, mayúscula, minúscula, número y símbolo).
 - **Iniciar y cerrar sesión**, con la sesión guardada en una cookie protegida.
 - **Recuperar la contraseña** con un enlace de un solo uso que dura 30 minutos.
+- **Crear, editar y eliminar tareas** con título, descripción, estado, prioridad y fecha límite. Antes de eliminar se pide confirmación.
+- **Ver las tareas en un tablero** de 4 columnas (Pendiente, En progreso, En revisión, Completada), con aviso de las vencidas.
+- **Recibir avisos** dentro de la app y ver pantallas de carga, vacío y error.
 
-Próximamente: crear y editar tareas, tablero Kanban con arrastrar y soltar, filtros, dashboard con gráficos, tema claro y oscuro.
+Próximamente: arrastrar y soltar en el tablero, filtros, dashboard con gráficos, tema claro y oscuro.
 
 ## ⌨️ Atajos de teclado
 
