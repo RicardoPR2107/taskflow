@@ -1,40 +1,21 @@
-import { useState } from 'react';
-import { TASK_STATUS_LABELS, type TaskDto, type TaskStatus } from '@taskflow/shared';
 import { Alert } from '../../../shared/components/Alert';
 import { Button } from '../../../shared/components/Button';
 import { Spinner } from '../../../shared/components/Spinner';
-import { useToast } from '../../../shared/components/Toast';
 import { useCurrentUser } from '../../auth/hooks';
 import { DeleteTaskDialog } from '../../tasks/components/DeleteTaskDialog';
 import { TaskFormDialog } from '../../tasks/components/TaskFormDialog';
-import { useMoveTask, useTasks } from '../../tasks/hooks';
+import { useTasks } from '../../tasks/hooks';
+import { useTaskDialogs, useTaskMove } from '../../tasks/useTaskActions';
 import { KanbanBoard } from '../components/KanbanBoard';
 
 export default function BoardPage() {
   const { data: user } = useCurrentUser();
   const tasksQuery = useTasks();
-  const moveTask = useMoveTask();
-  const toast = useToast();
-  const [formTask, setFormTask] = useState<TaskDto | null | undefined>(undefined); // undefined = cerrado
-  const [taskToDelete, setTaskToDelete] = useState<TaskDto | null>(null);
+  const { formTask, setFormTask, taskToDelete, setTaskToDelete } = useTaskDialogs();
+  const handleMove = useTaskMove();
 
   const tasks = tasksQuery.data?.tasks ?? [];
   const total = tasksQuery.data?.total ?? 0;
-
-  function handleMove(task: TaskDto, status: TaskStatus) {
-    if (task.status === status) return;
-    moveTask.mutate(
-      { task, status },
-      {
-        onSuccess: () => toast.show(`“${task.title}” pasó a ${TASK_STATUS_LABELS[status]}`),
-        onError: () =>
-          toast.show(
-            `No se pudo mover “${task.title}”. Volvió a ${TASK_STATUS_LABELS[task.status]}.`,
-            'error',
-          ),
-      },
-    );
-  }
 
   return (
     <div>
@@ -87,8 +68,8 @@ export default function BoardPage() {
 
       {tasksQuery.isSuccess && total > tasks.length && (
         <p className="mt-4 text-sm text-ink/75">
-          Mostrando las {tasks.length} tareas más recientes de {total}. Los filtros y la paginación
-          llegan en la Fase 4.
+          Mostrando las {tasks.length} tareas más recientes de {total}. Para ver el resto usa la
+          pantalla “Tareas”, que tiene filtros y paginación.
         </p>
       )}
 

@@ -1,9 +1,11 @@
 /** Pruebas UNITARIAS de las reglas de tareas: fechas, vencimiento y finalización (RN-01 a RN-10). */
 import { describe, expect, it } from 'vitest';
 import {
+  completionRate,
   createTaskSchema,
   isOverdue,
   isValidDateString,
+  lastDays,
   listTasksQuerySchema,
   nextCompletedAt,
   todayInZone,
@@ -89,11 +91,74 @@ describe('TC-TSK: esquemas (RN-01, RN-02, RN-07)', () => {
   });
 
   it('TC-TSK-12 la paginación tiene valores por defecto y un máximo', () => {
-    expect(listTasksQuerySchema.parse({})).toEqual({ page: 1, pageSize: 50 });
-    expect(listTasksQuerySchema.parse({ page: '2', pageSize: '10' })).toEqual({
+    expect(listTasksQuerySchema.parse({})).toEqual({ page: 1, pageSize: 50, sort: 'newest' });
+    expect(listTasksQuerySchema.parse({ page: '2', pageSize: '10' })).toMatchObject({
       page: 2,
       pageSize: 10,
     });
     expect(listTasksQuerySchema.safeParse({ pageSize: '101' }).success).toBe(false);
+  });
+});
+
+describe('TC-TSK: filtros de la lista', () => {
+  it('TC-TSK-13 acepta filtros válidos y los normaliza', () => {
+    expect(
+      listTasksQuerySchema.parse({
+        q: '  informe ',
+        status: 'DONE',
+        priority: 'HIGH',
+        overdue: 'true',
+        dueFrom: '2026-03-01',
+        dueTo: '2026-03-31',
+        sort: 'due_asc',
+      }),
+    ).toMatchObject({
+      q: 'informe',
+      status: 'DONE',
+      priority: 'HIGH',
+      overdue: true,
+      dueFrom: '2026-03-01',
+      dueTo: '2026-03-31',
+      sort: 'due_asc',
+    });
+  });
+
+  it('TC-TSK-14 rechaza estado, prioridad, orden o fechas inválidas', () => {
+    for (const bad of [
+      { status: 'NADA' },
+      { priority: 'MEGA' },
+      { sort: 'al_azar' },
+      { dueFrom: '2026-02-30' },
+      { overdue: 'quizas' },
+    ]) {
+      expect(listTasksQuerySchema.safeParse(bad).success).toBe(false);
+    }
+  });
+
+  it('TC-TSK-15 rechaza un rango de fechas al revés', () => {
+    const result = listTasksQuerySchema.safeParse({ dueFrom: '2026-03-10', dueTo: '2026-03-01' });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe('TC-TSK: indicadores del dashboard (RN-09)', () => {
+  it('TC-TSK-16 la tasa de finalización se redondea y, sin tareas, es 0 (sin dividir entre cero)', () => {
+    expect(completionRate(0, 0)).toBe(0);
+    expect(completionRate(1, 3)).toBe(33);
+    expect(completionRate(2, 3)).toBe(67);
+    expect(completionRate(5, 5)).toBe(100);
+    expect(completionRate(0, 4)).toBe(0);
+  });
+
+  it('TC-TSK-17 lastDays devuelve los días consecutivos terminando hoy, también al cruzar meses y años', () => {
+    expect(lastDays('2026-03-09', 3)).toEqual(['2026-03-07', '2026-03-08', '2026-03-09']);
+    expect(lastDays('2026-03-02', 4)).toEqual([
+      '2026-02-27',
+      '2026-02-28',
+      '2026-03-01',
+      '2026-03-02',
+    ]);
+    expect(lastDays('2027-01-01', 2)).toEqual(['2026-12-31', '2027-01-01']);
+    expect(lastDays('2026-03-09', 14)).toHaveLength(14);
   });
 });

@@ -48,7 +48,7 @@ export default defineConfig({
     // El móvil solo repite las pruebas de diseño y de registro (cada registro cuenta para el límite de la API).
     {
       name: 'movil',
-      testMatch: /(layout|register|tasks)\.spec\.ts/,
+      testMatch: /(layout|register|tasks|explore)\.spec\.ts/,
       use: { ...devices['Pixel 7'] },
     },
   ],

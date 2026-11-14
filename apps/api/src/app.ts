@@ -7,6 +7,7 @@ import { env } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import { createRateLimiters } from './middlewares/rateLimit.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
+import { dashboardRouter } from './modules/dashboard/dashboard.routes.js';
 import { tasksRouter } from './modules/tasks/tasks.routes.js';
 import { usersRouter } from './modules/users/users.routes.js';
 
@@ -31,7 +32,7 @@ export function createApp() {
   app.use('/api/auth', createAuthRouter(createRateLimiters()));
   app.use('/api/users', usersRouter);
   app.use('/api/tasks', tasksRouter);
-  // El dashboard se montará aquí en una fase posterior.
+  app.use('/api/dashboard', dashboardRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler); // siempre al final

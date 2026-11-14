@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   isOverdue,
   todayInZone,
@@ -8,10 +8,11 @@ import {
   type UpdateTaskInput,
 } from '@taskflow/shared';
 import { useCurrentUser } from '../auth/hooks';
-import { tasksApi } from './api';
+import { tasksApi, type TaskFilters } from './api';
+import { DASHBOARD_KEY } from '../dashboard/hooks';
 
 export const TASKS_KEY = ['tasks'] as const;
-/** Cuántas tareas trae el tablero de una vez. La paginación completa llega con los filtros (Fase 4). */
+/** Cuántas tareas trae el tablero de una vez. La lista de "Tareas" sí tiene paginación real. */
 export const BOARD_PAGE_SIZE = 100;
 
 export function useTasks() {
@@ -21,10 +22,23 @@ export function useTasks() {
   });
 }
 
-/** Tras crear, editar o eliminar, las listas se vuelven a pedir al servidor. */
+/** Lista paginada y filtrada por el servidor (pantalla "Tareas"). */
+export function useTaskList(page: number, pageSize: number, filters: TaskFilters) {
+  return useQuery({
+    queryKey: [...TASKS_KEY, 'list', { page, pageSize, filters }],
+    queryFn: () => tasksApi.list(page, pageSize, filters),
+    placeholderData: keepPreviousData, // al cambiar de página se ve la anterior en vez de un vacío
+  });
+}
+
+/** Tras crear, editar o eliminar, las listas y el dashboard se vuelven a pedir al servidor. */
 function useRefreshTasks() {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: TASKS_KEY });
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: TASKS_KEY }),
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_KEY }),
+    ]);
 }
 
 export function useCreateTask() {
@@ -89,6 +103,10 @@ export function useMoveTask() {
       context?.snapshot.forEach(([key, data]) => queryClient.setQueryData(key, data));
     },
 
-    onSettled: () => queryClient.invalidateQueries({ queryKey: TASKS_KEY }),
+    onSettled: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: TASKS_KEY }),
+        queryClient.invalidateQueries({ queryKey: DASHBOARD_KEY }),
+      ]),
   });
 }
