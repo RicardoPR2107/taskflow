@@ -1,0 +1,16 @@
+# Plano (Blueprint) de Render para la demo pública: un solo servicio Docker gratis.
+# Render construye el último destino del Dockerfile (`demo`): la API y la web en un solo contenedor.
+# La base de datos está en Neon (gratis, sin tarjeta); su dirección se pega al crear el servicio.
+services:
+  - type: web
+    name: taskflow
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Render te la pide al crear el servicio (no se guarda en GitHub)
+      - key: JWT_SECRET
+        generateValue: true # Render inventa un secreto aleatorio y largo
