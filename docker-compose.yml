@@ -1,0 +1,86 @@
+# Levanta todo TaskFlow: base de datos, migraciones, varias instancias de la API y Nginx como balanceador.
+# Uso: copia .env.example a .env, ajusta los secretos y ejecuta `docker compose up --build -d`.
+name: taskflow
+
+x-api-build: &api-build
+  context: .
+  target: api
+
+x-api-env: &api-env
+  DATABASE_URL: postgresql://taskflow:${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}@db:5432/taskflow
+  JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env (mínimo 32 caracteres)}
+  CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: taskflow
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U taskflow -d taskflow']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Se ejecuta una vez, crea o actualiza las tablas y termina. Las instancias de la API esperan a que acabe.
+  migrate:
+    build: *api-build
+    image: taskflow-api:local
+    environment: *api-env
+    command:
+      - sh
+      - -c
+      - |
+        if [ -d prisma/migrations ] && [ -n "$$(ls -A prisma/migrations)" ]; then
+          npx prisma migrate deploy
+        else
+          npx prisma db push
+        fi
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
+
+  api:
+    build: *api-build
+    image: taskflow-api:local
+    restart: unless-stopped
+    environment:
+      <<: *api-env
+      NODE_ENV: production
+      PORT: '3000'
+    deploy:
+      replicas: ${API_REPLICAS:-3} # cuántas instancias de Express corren a la vez
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  web:
+    build:
+      context: .
+      target: web
+    image: taskflow-web:local
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-8080}:80'
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  db-data:

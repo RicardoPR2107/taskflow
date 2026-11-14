@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+!.env.example
+.git
+.github
+e2e/test-results
+e2e/playwright-report
+e2e/.outbox
+apps/api/src/generated
+*.log
