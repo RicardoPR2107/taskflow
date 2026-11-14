@@ -60,7 +60,6 @@ Todavía no hay. Por ahora, con el teclado se mueve una tarea con el selector �
 
 - Envío real de correos para la recuperación de contraseña.
 - Notificaciones dentro de la app y modo oscuro.
-- Despliegue con Docker, Nginx y varias instancias del backend.
 - Pruebas de carga con k6 y monitoreo con Grafana.
 
 ## 🚀 Cómo ejecutarlo
@@ -86,6 +85,25 @@ npm install
    npm run dev
    ```
 5. Abre http://localhost:5173.
+
+### Con Docker (Nginx + varias instancias)
+
+Necesitas Docker Desktop. Levanta la base de datos, 3 instancias de la API y Nginx como balanceador de carga:
+
+```bash
+cp .env.example .env        # en PowerShell: Copy-Item .env.example .env
+# edita .env: pon una contraseña y un JWT_SECRET real
+npm run docker:up
+```
+
+Abre http://localhost:8080. Para crear la cuenta de prueba: `docker compose run --rm migrate npx tsx prisma/seed.ts`.
+Para comprobar que todo funciona (incluido el reparto de carga): `npm run docker:smoke`. Para apagar: `npm run docker:down`.
+
+### Demo pública (gratis, sin tarjeta)
+
+La demo corre en un solo contenedor (API + web) en **Render**, con la base de datos en **Neon**. Es el último destino del `Dockerfile` y se describe en `render.yaml`. Entra con la cuenta de prueba `demo@taskflow.dev` / `Demo-Task#2026`.
+
+> El plan gratis de Render duerme el servicio tras 15 minutos sin uso: la primera visita puede tardar cerca de 1 minuto. La demo usa una sola instancia; el balanceo de carga con Nginx se ve con Docker en local.
 
 ### Pruebas
 

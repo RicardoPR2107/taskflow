@@ -79,3 +79,43 @@ jobs:
           name: reporte-e2e
           path: e2e/playwright-report
           retention-days: 7
+
+  docker:
+    name: Docker
+    needs: calidad
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crear el .env con secretos temporales
+        run: |
+          {
+            echo "POSTGRES_PASSWORD=ci$(openssl rand -hex 8)"
+            echo "JWT_SECRET=$(openssl rand -hex 32)"
+            echo "CORS_ORIGIN=http://localhost:8080"
+          } > .env
+      - name: Construir y levantar todo (base de datos, 3 instancias de la API y Nginx)
+        run: docker compose up -d --build
+      - name: Prueba de humo (balanceo, seguridad y flujo completo)
+        run: bash scripts/smoke.sh
+      - name: Construir y probar la demo de un solo contenedor (la que se publica en Render)
+        run: |
+          docker build -t taskflow-demo .
+          PASS=$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2)
+          docker run -d --name demo --network taskflow_default -p 8081:3000 \
+            -e PORT=3000 \
+            -e DATABASE_URL="postgresql://taskflow:${PASS}@db:5432/taskflow" \
+            -e JWT_SECRET="$(openssl rand -hex 32)" \
+            -e CORS_ORIGIN=http://localhost:8081 \
+            taskflow-demo
+          bash scripts/smoke-demo.sh
+      - name: Mostrar los registros si algo falló
+        if: failure()
+        run: |
+          docker compose ps -a
+          docker compose logs --tail=100
+          docker logs demo || true
+      - name: Apagar
+        if: always()
+        run: |
+          docker rm -f demo || true
+          docker compose down -v

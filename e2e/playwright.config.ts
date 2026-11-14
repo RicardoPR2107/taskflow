@@ -69,6 +69,7 @@ export default defineConfig({
         JWT_SECRET: 'secreto-solo-para-e2e-0123456789abcdefghijklmnop',
         MAIL_OUTBOX_FILE: OUTBOX_FILE,
         REGISTER_RATE_LIMIT: '1000', // las pruebas crean muchas cuentas desde la misma IP
+        API_RATE_LIMIT: '100000', // y hacen miles de peticiones desde una sola IP
       },
     },
     {

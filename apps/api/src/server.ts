@@ -14,8 +14,9 @@ async function main() {
     process.exit(1);
   }
 
-  // La cuenta de prueba siempre existe fuera de producción (en producción: npm run db:seed).
-  if (env.NODE_ENV !== 'production') {
+  // La cuenta de prueba siempre existe fuera de producción (en producción: npm run db:seed,
+  // o SEED_DEMO=true en la demo pública).
+  if (env.NODE_ENV !== 'production' || env.SEED_DEMO === 'true') {
     const demo = await ensureDemoUser();
     if (demo !== 'exists')
       console.log(

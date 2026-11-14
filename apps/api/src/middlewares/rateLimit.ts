@@ -39,12 +39,21 @@ const resetPasswordLimiter = () =>
     limit: 10,
   });
 
+// Límite general para toda la API: 600 peticiones cada 15 minutos por IP (frena abusos y bucles).
+// Las pruebas E2E lo suben con API_RATE_LIMIT porque hacen miles de peticiones desde una sola IP.
+const apiLimiter = () =>
+  rateLimit({
+    ...tooManyRequests('Demasiadas peticiones. Espera unos minutos e inténtalo de nuevo'),
+    limit: Number(process.env.API_RATE_LIMIT) || 600,
+  });
+
 /**
  * Cada instancia de la aplicación crea sus propios contadores. En producción hay una sola,
  * pero así las pruebas pueden crear una aplicación nueva sin heredar bloqueos de otras pruebas.
  */
 export function createRateLimiters() {
   return {
+    api: apiLimiter(),
     login: loginLimiter(),
     register: registerLimiter(),
     forgotPassword: forgotPasswordLimiter(),
