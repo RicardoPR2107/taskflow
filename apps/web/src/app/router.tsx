@@ -12,6 +12,8 @@ const RegisterPage = lazy(() => import('../features/auth/pages/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('../features/auth/pages/ResetPasswordPage'));
 const BoardPage = lazy(() => import('../features/kanban/pages/BoardPage'));
+const TasksPage = lazy(() => import('../features/tasks/pages/TasksPage'));
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage'));
 const NotFoundPage = lazy(() => import('../shared/pages/NotFoundPage'));
 
 /** Mapa de rutas de la aplicación. Se exporta como datos para poder probarlo sin navegador real. */
@@ -34,7 +36,11 @@ export const routes: RouteObject[] = [
         children: [
           {
             element: <AppLayout />,
-            children: [{ path: '/tablero', element: <BoardPage /> }],
+            children: [
+              { path: '/tablero', element: <BoardPage /> },
+              { path: '/tareas', element: <TasksPage /> },
+              { path: '/dashboard', element: <DashboardPage /> },
+            ],
           },
         ],
       },

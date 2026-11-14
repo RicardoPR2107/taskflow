@@ -23,10 +23,15 @@ async function todayFor(userId: string): Promise<string> {
 
 // El service tiene las reglas de negocio. No sabe nada de HTTP ni de Prisma.
 export const tasksService = {
-  async list(userId: string, { page, pageSize }: ListTasksQuery): Promise<TaskListResponse> {
+  async list(userId: string, filters: ListTasksQuery): Promise<TaskListResponse> {
     const today = await todayFor(userId);
-    const [tasks, total] = await tasksRepository.list(userId, (page - 1) * pageSize, pageSize);
-    return { tasks: tasks.map((task) => toTaskDto(task, today)), total, page, pageSize };
+    const [tasks, total] = await tasksRepository.list(userId, filters, today);
+    return {
+      tasks: tasks.map((task) => toTaskDto(task, today)),
+      total,
+      page: filters.page,
+      pageSize: filters.pageSize,
+    };
   },
 
   async get(userId: string, id: string): Promise<TaskDto> {
