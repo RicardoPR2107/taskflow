@@ -93,6 +93,8 @@ jobs:
             echo "JWT_SECRET=$(openssl rand -hex 32)"
             echo "CORS_ORIGIN=http://localhost:8080"
           } > .env
+      - name: Validar la configuración de las pruebas de carga
+        run: docker compose -f docker-compose.yml -f loadtest/compose.yml --profile tools config -q
       - name: Construir y levantar todo (base de datos, 3 instancias de la API y Nginx)
         run: docker compose up -d --build
       - name: Prueba de humo (balanceo, seguridad y flujo completo)

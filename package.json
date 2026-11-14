@@ -26,7 +26,11 @@
     "docker:up": "docker compose up --build -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f --tail=50",
-    "docker:smoke": "bash scripts/smoke.sh"
+    "docker:smoke": "bash scripts/smoke.sh",
+    "load:up:1": "docker compose -f docker-compose.yml -f loadtest/compose.yml up -d --build --scale api=1 && docker compose -f docker-compose.yml -f loadtest/compose.yml restart web",
+    "load:up:3": "docker compose -f docker-compose.yml -f loadtest/compose.yml up -d --build --scale api=3 && docker compose -f docker-compose.yml -f loadtest/compose.yml restart web",
+    "load:run": "docker compose -f docker-compose.yml -f loadtest/compose.yml run --rm k6",
+    "load:down": "docker compose -f docker-compose.yml -f loadtest/compose.yml down"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
