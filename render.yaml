@@ -6,6 +6,7 @@ services:
     name: taskflow
     runtime: docker
     plan: free
+    region: virginia # junto a la base de datos de Neon (AWS US East 1)
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     autoDeploy: true
