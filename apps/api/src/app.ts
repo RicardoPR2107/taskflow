@@ -6,6 +6,7 @@ import type { HealthResponse } from '@taskflow/shared';
 import { env } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 import { createRateLimiters } from './middlewares/rateLimit.js';
+import { noStore, requireSameOrigin } from './middlewares/security.js';
 import { createAuthRouter } from './modules/auth/auth.routes.js';
 import { dashboardRouter } from './modules/dashboard/dashboard.routes.js';
 import { tasksRouter } from './modules/tasks/tasks.routes.js';
@@ -29,7 +30,9 @@ export function createApp() {
     res.json(body);
   });
 
-  app.use('/api/auth', createAuthRouter(createRateLimiters()));
+  const limiters = createRateLimiters();
+  app.use('/api', limiters.api, noStore, requireSameOrigin); // protecciones comunes a toda la API
+  app.use('/api/auth', createAuthRouter(limiters));
   app.use('/api/users', usersRouter);
   app.use('/api/tasks', tasksRouter);
   app.use('/api/dashboard', dashboardRouter);
