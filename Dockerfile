@@ -42,3 +42,11 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
 COPY --from=web-build /app/apps/web/dist /usr/share/nginx/html
 EXPOSE 80
+
+# ---------- Demo pública (Render): un solo contenedor con API + web ----------
+# Es el ÚLTIMO destino, así que es el que se construye cuando no se indica ninguno (como hace Render).
+FROM api AS demo
+COPY --from=web-build /app/apps/web/dist /app/web-dist
+ENV WEB_DIST_DIR=/app/web-dist SEED_DEMO=true
+# Antes de arrancar, crea o actualiza las tablas en la base de datos (igual que el servicio `migrate`).
+CMD ["sh", "-c", "if [ -d prisma/migrations ] && [ -n \"$(ls -A prisma/migrations)\" ]; then npx prisma migrate deploy; else npx prisma db push; fi && npx tsx src/server.ts"]

@@ -5,7 +5,12 @@ import { z } from 'zod';
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(3000),
-  CORS_ORIGIN: z.url().default('http://localhost:5173'),
+  // En Render, RENDER_EXTERNAL_URL trae la dirección pública del sitio: así no hay que escribirla a mano.
+  CORS_ORIGIN: z.url().default(process.env.RENDER_EXTERNAL_URL ?? 'http://localhost:5173'),
+  // Demo de un solo contenedor: carpeta con la web ya compilada para que Express la sirva.
+  WEB_DIST_DIR: z.string().optional(),
+  // 'true' crea la cuenta de prueba al arrancar, también en producción (solo para la demo pública).
+  SEED_DEMO: z.enum(['true', 'false']).default('false'),
   DATABASE_URL: z
     .string({ error: 'Falta DATABASE_URL en el archivo .env' })
     .startsWith('postgresql://', 'DATABASE_URL debe empezar con postgresql://'),
