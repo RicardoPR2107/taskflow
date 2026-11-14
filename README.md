@@ -1,102 +1,106 @@
-# TaskFlow
+# 🗂️ TaskFlow
 
-Aplicación web de gestión de tareas con tablero Kanban y dashboard de productividad.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express-5-000000?logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?logo=prisma&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-45ba4b?logo=playwright&logoColor=white)
 
-**Stack:** TypeScript, React, Node.js, Express (más Vite, Zod, PostgreSQL y Prisma).
+Aplicación web full stack para gestionar tareas personales con un tablero Kanban y un dashboard de productividad. Es un proyecto de portafolio para practicar diseño de interfaces, lógica de negocio, seguridad y pruebas automatizadas.
 
-## Estructura
+> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros y el dashboard. Falta pulir seguridad, despliegue y el tema oscuro.
 
-```
-apps/web         Frontend (React + Vite)
-apps/api         Backend (Node + Express)
-packages/shared  Esquemas Zod y tipos compartidos por frontend y backend
-```
+## 📦 Tecnologías
 
-Es un monorepo gestionado con **npm workspaces**: una sola instalación para todo.
+- **Frontend:** React, TypeScript, Vite, React Router, TanStack Query, React Hook Form, Tailwind CSS
+- **Backend:** Node.js, Express, Prisma, PostgreSQL
+- **Validación:** Zod (el mismo esquema en frontend y backend)
+- **Pruebas:** Vitest, React Testing Library, Supertest, Playwright
+- **Calidad:** GitHub Actions (CI), Prettier
 
-## Puesta en marcha
+## ✨ Funcionalidades
 
-Requisitos: Node.js 22 o superior, npm, Git y PostgreSQL.
+Lo que ya puede hacer el usuario:
 
-```bash
-npm install                                  # instala todo (raíz y workspaces)
-cp apps/api/.env.example apps/api/.env       # en PowerShell: Copy-Item apps/api/.env.example apps/api/.env
-npm run dev                                  # levanta API (3000) y web (5173)
-```
+- **Crear una cuenta** con una contraseña segura (mínimo 10 caracteres, mayúscula, minúscula, número y símbolo).
+- **Iniciar y cerrar sesión**, con la sesión guardada en una cookie protegida.
+- **Recuperar la contraseña** con un enlace de un solo uso que dura 30 minutos.
+- **Crear, editar y eliminar tareas** con título, descripción, estado, prioridad y fecha límite. Antes de eliminar se pide confirmación.
+- **Ver las tareas en un tablero** de 4 columnas (Pendiente, En progreso, En revisión, Completada), con aviso de las vencidas.
+- **Mover tareas entre columnas** arrastrándolas o con el selector “Mover a”. El cambio se ve al instante y, si el servidor falla, la tarea vuelve a su columna y se avisa.
+- **Buscar, filtrar y ordenar** en la pantalla “Tareas”: por texto, estado, prioridad, rango de fechas y “solo vencidas”, con paginación de 10 en 10. Los filtros quedan en la dirección, así se pueden guardar o compartir.
+- **Ver su progreso en un dashboard**: total, pendientes, en progreso, completadas, vencidas y tasa de finalización, con gráficos por estado, por prioridad y de lo completado en los últimos 14 días.
+- **Recibir avisos** dentro de la app y ver pantallas de carga, vacío y error.
 
-Abre http://localhost:5173: debe decir "Estado de la API: conectada".
+Próximamente: tema claro y oscuro.
 
-## Base de datos (Prisma + PostgreSQL)
+## ⌨️ Atajos de teclado
 
-1. Crea una base de datos vacía llamada `taskflow` en tu PostgreSQL.
-2. En `apps/api/.env`, ajusta `DATABASE_URL` con tu usuario y contraseña.
-3. Genera el cliente y crea las tablas:
+Todavía no hay. Por ahora, con el teclado se mueve una tarea con el selector “Mover a” de cada tarjeta.
 
-```bash
-npm run db:generate -w @taskflow/api
-npm run db:migrate -w @taskflow/api -- --name init
-```
+## 🧑‍🍳 El proceso
 
-Al arrancar con `npm run dev`, la API debe mostrar "Base de datos conectada".
+1. Definí los requisitos, las reglas de negocio y el stack antes de escribir código.
+2. Armé un monorepo con `npm workspaces`: `apps/web`, `apps/api` y `packages/shared`.
+3. Construí el backend por capas (rutas, controladores, servicios y repositorio) con Prisma sobre PostgreSQL.
+4. Agregué la seguridad desde el inicio: Argon2id, cookies `HttpOnly`, límite de intentos y cabeceras con Helmet.
+5. Diseñé la interfaz con un estilo brutalista limpio (crema, negro y naranja) y la hice responsive.
+6. Escribí pruebas en cada nivel y las conecté a un CI que corre en cada Pull Request.
 
-## Autenticación
+## 📚 Lo que aprendí
 
-En `apps/api/.env` hace falta un `JWT_SECRET` real. Genéralo con:
+- A mantener las reglas de validación en un solo lugar (`packages/shared`) para que frontend y backend nunca se contradigan.
+- A guardar contraseñas y tokens de forma segura, y a no revelar si un correo existe.
+- A probar en cuatro niveles: unitarias, componentes, API y flujos completos con navegador real.
+- A trabajar con ramas, Pull Requests e integración continua.
 
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-```
+## 💡 Cómo se podría mejorar
 
-Endpoints disponibles:
+- Envío real de correos para la recuperación de contraseña.
+- Notificaciones dentro de la app y modo oscuro.
+- Despliegue con Docker, Nginx y varias instancias del backend.
+- Pruebas de carga con k6 y monitoreo con Grafana.
 
-| Método | Ruta                 | Función                               |
-| ------ | -------------------- | ------------------------------------- |
-| POST   | `/api/auth/register` | Crear cuenta e iniciar sesión         |
-| POST   | `/api/auth/login`    | Iniciar sesión                        |
-| POST   | `/api/auth/logout`   | Cerrar sesión                         |
-| GET    | `/api/users/me`      | Datos del usuario con sesión iniciada |
+## 🚀 Cómo ejecutarlo
 
-La sesión viaja en una cookie `HttpOnly` y las contraseñas se guardan con Argon2id.
-
-## Scripts (desde la raíz)
-
-| Comando                              | Qué hace                                       |
-| ------------------------------------ | ---------------------------------------------- |
-| `npm run dev`                        | Arranca backend y frontend a la vez            |
-| `npm run typecheck`                  | Revisa los tipos de TypeScript en todo el repo |
-| `npm run build`                      | Compila el frontend para producción            |
-| `npm run format`                     | Da formato uniforme al código con Prettier     |
-| `npm run db:studio -w @taskflow/api` | Abre Prisma Studio para ver los datos          |
-
-## Frontend
-
-- **Estilos:** Tailwind CSS. Los colores, sombras y tipografías del sistema de diseño están en `apps/web/src/index.css` (bloque `@theme`).
-- **Paleta:** cream `#F3EEE3`, ink `#111111` y burnt orange `#D9541E`.
-- **Rutas:** `/login` y `/registro` (públicas), `/tablero` (privada). Cada pantalla se carga de forma perezosa (`React.lazy`).
-- **Sesión:** `useCurrentUser` consulta `/api/users/me`; `ProtectedRoute` y `PublicOnlyRoute` deciden a dónde va cada visitante.
-
-## Cuenta de prueba, contraseñas y recuperación
-
-- **Cuenta de prueba:** `demo@taskflow.dev` / `Demo-Task#2026`. La API la crea (o la restaura) sola al arrancar fuera de producción. También se puede crear con `npm run db:seed -w @taskflow/api`. En el login aparece un botón para autocompletarla.
-- **Política de contraseñas:** mínimo 10 caracteres, con minúscula, mayúscula, número y carácter especial. Está definida una sola vez en `packages/shared` y la usan el backend y el frontend.
-- **Recuperar contraseña:** `/recuperar` pide el correo y genera un enlace de un solo uso, válido 30 minutos. Como aún no hay servicio de correo, en desarrollo el enlace se imprime en la terminal de la API ("correo simulado"). Para enviar correos reales solo hay que reemplazar `apps/api/src/lib/mailer.ts`.
-- **Pie de página:** todas las pantallas muestran "© año Ricardo Palma. Todos los derechos reservados." (se cambia en `apps/web/src/shared/config.ts`).
-
-Después de actualizar el código, aplica la nueva tabla de recuperación:
+Necesitas Node.js 22 o superior, npm, Git y PostgreSQL.
 
 ```bash
-npm run db:generate -w @taskflow/api
-npm run db:migrate -w @taskflow/api   # cuando pida un nombre, escribe: password_reset
+git clone https://github.com/RicardoPR2107/taskflow.git
+cd taskflow
+npm install
 ```
 
-## Pruebas
+1. Crea una base de datos vacía llamada `taskflow` en PostgreSQL.
+2. Copia `apps/api/.env.example` como `apps/api/.env` (en PowerShell: `Copy-Item apps/api/.env.example apps/api/.env`).
+3. En ese `.env`, pon tu contraseña de PostgreSQL en `DATABASE_URL` y un secreto en `JWT_SECRET`. Para generarlo:
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+   ```
+4. Crea las tablas y arranca la app:
+   ```bash
+   npm run db:generate -w @taskflow/api
+   npm run db:migrate -w @taskflow/api
+   npm run dev
+   ```
+5. Abre http://localhost:5173.
 
-Se ejecutan desde la raíz:
+### Pruebas
 
-| Comando            | Qué ejecuta                                                                                |
-| ------------------ | ------------------------------------------------------------------------------------------ |
-| `npm test`         | Unitarias (`packages/shared/tests`), API (`apps/api/tests`) y pantallas (`apps/web/tests`) |
-| `npm run test:e2e` | Extremo a extremo con navegador real (`e2e/tests`)                                         |
-| `npm run test:all` | Revisión de tipos + todas las pruebas                                                      |
+```bash
+npm test                                   # unitarias, API y componentes
+npx playwright install chromium            # solo la primera vez
+npm run test:e2e                           # flujos completos con navegador real
+```
 
-Las pruebas usan su propia base de datos (`taskflow_test`, se crea sola) y nunca tocan la de desarrollo. La primera vez, instala el navegador con `npx playwright install chromium`.
+Las pruebas usan su propia base de datos (`taskflow_test`, se crea sola) y no tocan la tuya.
+
+## 🎥 Video
+
+_Se agregará cuando el proyecto esté terminado._
+
+## 📄 Derechos
+
+© Ricardo Palma. Todos los derechos reservados.

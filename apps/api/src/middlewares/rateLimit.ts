@@ -17,11 +17,12 @@ const loginLimiter = () =>
     skipSuccessfulRequests: true,
   });
 
-// Máximo 20 registros cada 15 minutos por IP.
+// Máximo 20 registros cada 15 minutos por IP. (Las pruebas E2E crean muchas cuentas desde una sola IP
+// y suben el límite con REGISTER_RATE_LIMIT; en producción no se define y rige el 20.)
 const registerLimiter = () =>
   rateLimit({
     ...tooManyRequests('Demasiados registros desde esta conexión. Inténtalo más tarde'),
-    limit: 20,
+    limit: Number(process.env.REGISTER_RATE_LIMIT) || 20,
   });
 
 // Máximo 5 solicitudes de recuperación cada 15 minutos por IP (evita inundar de correos a alguien).

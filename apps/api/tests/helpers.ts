@@ -25,3 +25,11 @@ export function sessionCookieHeader(response: request.Response): string | undefi
 }
 
 export const cookieValue = (header: string) => header.split(';')[0]!.split('=')[1]!;
+
+/** Un "navegador" con sesión iniciada: crea la cuenta y conserva su cookie para las siguientes peticiones. */
+export async function loggedInAgent(overrides: Record<string, unknown> = {}) {
+  const agent = request.agent(createApp());
+  const response = await agent.post('/api/auth/register').send(validRegistration(overrides));
+  if (response.status !== 201) throw new Error(`No se pudo crear la cuenta: ${response.status}`);
+  return agent;
+}

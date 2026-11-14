@@ -46,7 +46,11 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } },
     },
     // El móvil solo repite las pruebas de diseño y de registro (cada registro cuenta para el límite de la API).
-    { name: 'movil', testMatch: /(layout|register)\.spec\.ts/, use: { ...devices['Pixel 7'] } },
+    {
+      name: 'movil',
+      testMatch: /(layout|register|tasks|explore)\.spec\.ts/,
+      use: { ...devices['Pixel 7'] },
+    },
   ],
 
   webServer: [
@@ -64,6 +68,7 @@ export default defineConfig({
         DATABASE_URL: testUrl.toString(),
         JWT_SECRET: 'secreto-solo-para-e2e-0123456789abcdefghijklmnop',
         MAIL_OUTBOX_FILE: OUTBOX_FILE,
+        REGISTER_RATE_LIMIT: '1000', // las pruebas crean muchas cuentas desde la misma IP
       },
     },
     {
