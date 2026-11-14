@@ -10,7 +10,9 @@
 
 Aplicación web full stack para gestionar tareas personales con un tablero Kanban y un dashboard de productividad. Es un proyecto de portafolio para practicar diseño de interfaces, lógica de negocio, seguridad y pruebas automatizadas.
 
-> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros y el dashboard. Falta pulir seguridad, despliegue y el tema oscuro.
+> 🌐 **Demo en vivo:** https://taskflow-lrr4.onrender.com — entra con `demo@taskflow.dev` / `Demo-Task#2026`. Es un plan gratuito: la primera visita puede tardar cerca de 1 minuto en despertar.
+
+> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros, el dashboard, la seguridad y el despliegue con Docker. Falta el tema oscuro y las pruebas de carga.
 
 ## 📦 Tecnologías
 
@@ -101,7 +103,7 @@ Para comprobar que todo funciona (incluido el reparto de carga): `npm run docker
 
 ### Demo pública (gratis, sin tarjeta)
 
-La demo corre en un solo contenedor (API + web) en **Render**, con la base de datos en **Neon**. Es el último destino del `Dockerfile` y se describe en `render.yaml`. Entra con la cuenta de prueba `demo@taskflow.dev` / `Demo-Task#2026`.
+La demo (https://taskflow-lrr4.onrender.com) corre en un solo contenedor (API + web) en **Render**, con la base de datos en **Neon**, ambos en la región de Virginia. Es el último destino del `Dockerfile` y `render.yaml` describe el servicio.
 
 > El plan gratis de Render duerme el servicio tras 15 minutos sin uso: la primera visita puede tardar cerca de 1 minuto. La demo usa una sola instancia; el balanceo de carga con Nginx se ve con Docker en local.
 
