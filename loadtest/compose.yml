@@ -1,0 +1,56 @@
+# Pruebas de carga: se SUMA al docker-compose.yml principal (no lo reemplaza).
+# Uso (desde la raíz):  docker compose -f docker-compose.yml -f loadtest/compose.yml up -d
+# Mira los scripts `load:*` de package.json.
+services:
+  api:
+    environment:
+      # Con una sola IP (k6) los límites normales bloquearían la prueba.
+      API_RATE_LIMIT: '10000000'
+      REGISTER_RATE_LIMIT: '10000'
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5' # cada instancia usa como máximo medio núcleo: así se ve claro cuándo una se satura
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-remote-write-receiver # permite que k6 le envíe métricas
+      - --storage.tsdb.retention.time=2d
+    volumes:
+      - ./loadtest/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - '9090:9090'
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    environment:
+      # Es un laboratorio local: entra directo, sin contraseña.
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+    volumes:
+      - ./loadtest/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./loadtest/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - '3001:3000'
+    depends_on:
+      - prometheus
+
+  # No arranca con `up`: se ejecuta solo cuando tú lo pides (profiles). Mira `npm run load:run`.
+  k6:
+    image: grafana/k6:1.0.0
+    profiles: [tools]
+    command: run -o experimental-prometheus-rw /scripts/script.js
+    environment:
+      BASE_URL: http://web # Nginx, dentro de la red de Docker
+      PEAK_VUS: ${PEAK_VUS:-40}
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_STATS: p(95),p(99),avg,max
+      K6_PROMETHEUS_RW_PUSH_INTERVAL: 2s
+    volumes:
+      - ./loadtest/k6:/scripts:ro
+    depends_on:
+      - prometheus
+      - web

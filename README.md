@@ -121,6 +121,27 @@ Las pruebas usan su propia base de datos (`taskflow_test`, se crea sola) y no to
 
 _Se agregará cuando el proyecto esté terminado._
 
+## Pruebas de carga y escalabilidad
+
+Las pruebas de carga usan **k6** (genera usuarios virtuales), **Prometheus** (guarda las métricas) y **Grafana** (las muestra). La API se limita a 0.5 CPU por instancia para que una sola se sature de forma visible.
+
+```bash
+npm run load:up:1   # 1 instancia de la API
+npm run load:run    # ejecuta k6 (unos 4 minutos)
+npm run load:up:3   # 3 instancias detrás de Nginx
+npm run load:run
+npm run load:down   # apaga todo
+```
+
+Grafana queda en http://localhost:3001, en el dashboard "TaskFlow - Pruebas de carga (k6)".
+
+| Instancias de la API | p95 (peor endpoint) | Umbral p95 < 800 ms | Errores |
+| -------------------- | ------------------- | ------------------- | ------- |
+| 1                    | ≈ 1,66 s            | No cumple           | 0       |
+| 3                    | ≈ 0,62 s            | Cumple              | 0       |
+
+El p95 es el tiempo dentro del cual responde el 95 % de las peticiones. Los resultados dependen de la PC donde se ejecute, porque Docker Desktop reparte sus CPU entre todos los contenedores.
+
 ## 📄 Derechos
 
 © Ricardo Palma. Todos los derechos reservados.
