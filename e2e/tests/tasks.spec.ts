@@ -192,3 +192,23 @@ test.describe('TC-E2E-TSK: tareas', () => {
     await expect(column(page, 'Pendiente').getByText('No se perderá')).toBeVisible();
   });
 });
+
+test.describe('TC-E2E-TSK: mover con el selector', () => {
+  test('TC-E2E-TSK-11 el selector "Mover a" cambia la tarea de columna y persiste al recargar', async ({
+    page,
+  }) => {
+    await register(page);
+    await createTask(page, { title: 'Preparar la demo' });
+
+    await page
+      .getByLabel('Mover tarea: Preparar la demo')
+      .selectOption({ label: 'Mover a: En progreso' });
+
+    await expect(column(page, 'En progreso').getByText('Preparar la demo')).toBeVisible();
+    await expect(column(page, 'Pendiente').getByText('Preparar la demo')).toBeHidden();
+    await expect(page.getByText('“Preparar la demo” pasó a En progreso')).toBeVisible();
+
+    await page.reload();
+    await expect(column(page, 'En progreso').getByText('Preparar la demo')).toBeVisible();
+  });
+});
