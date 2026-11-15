@@ -1,0 +1,30 @@
+flowchart TB
+  k6["<b>k6</b><br/>usuarios virtuales: login · listar · crear · completar · borrar"]:::acento
+
+  subgraph objetivo["Sistema bajo prueba"]
+    direction LR
+    nginx["Nginx"]:::nodo
+    subgraph apis["API · 0.5 CPU por instancia"]
+      direction LR
+      a1["api-1"]:::nodo
+      a2["api-2<br/>(solo en la prueba de 3)"]:::suave
+      a3["api-3<br/>(solo en la prueba de 3)"]:::suave
+    end
+    db[("PostgreSQL")]:::datos
+  end
+
+  prom["<b>Prometheus</b><br/>guarda las métricas"]:::nodo
+  graf["<b>Grafana</b><br/>VUs · peticiones/s · errores · p95 · reparto por instancia"]:::acento
+
+  k6 -- "peticiones HTTP" --> nginx
+  nginx --> apis
+  apis --> db
+  k6 -- "métricas (remote write)" --> prom
+  prom -- "Grafana las consulta" --- graf
+
+  classDef nodo fill:#FBF8F1,stroke:#111111,stroke-width:2px,color:#111111
+  classDef acento fill:#D9541E,stroke:#111111,stroke-width:2px,color:#111111
+  classDef datos fill:#F8DCCB,stroke:#111111,stroke-width:2px,color:#111111
+  classDef suave fill:#F3EEE3,stroke:#111111,stroke-width:1.5px,stroke-dasharray:4 3,color:#111111
+  style objetivo fill:#F3EEE3,stroke:#111111,stroke-width:2px
+  style apis fill:#FBF8F1,stroke:#111111,stroke-width:1.5px

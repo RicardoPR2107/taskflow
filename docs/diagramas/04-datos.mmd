@@ -1,0 +1,36 @@
+erDiagram
+  USER ||--o{ TASK : "tiene"
+  USER ||--o{ PASSWORD_RESET_TOKEN : "solicita"
+
+  USER {
+    uuid id PK
+    string email UK "único"
+    string name
+    string passwordHash "argon2id"
+    string timezone "zona horaria del usuario"
+    enum theme "reservado: hoy el tema se guarda en el navegador"
+    timestamptz createdAt
+    timestamptz updatedAt
+  }
+
+  TASK {
+    uuid id PK
+    uuid userId FK "dueño de la tarea"
+    string title "1 a 100 caracteres"
+    string description "opcional"
+    enum status "PENDING, IN_PROGRESS, IN_REVIEW, DONE"
+    enum priority "LOW, MEDIUM, HIGH, URGENT"
+    date dueDate "solo fecha, opcional"
+    timestamptz completedAt "solo si está completada"
+    timestamptz createdAt
+    timestamptz updatedAt
+  }
+
+  PASSWORD_RESET_TOKEN {
+    uuid id PK
+    uuid userId FK
+    string tokenHash UK "SHA-256 del token del enlace"
+    timestamptz expiresAt
+    timestamptz usedAt "un enlace sirve una sola vez"
+    timestamptz createdAt
+  }
