@@ -1,0 +1,23 @@
+sequenceDiagram
+  actor U as Usuario
+  participant W as Web (React)
+  participant N as Nginx
+  participant A as API (Express)
+  participant D as PostgreSQL
+
+  U->>W: Escribe correo y contraseña
+  W->>W: Valida con Zod (mismos esquemas que la API)
+  W->>N: POST /api/auth/login
+  N->>A: Reenvía a una instancia
+  Note over A: Límite de intentos · comprueba el origen · valida el cuerpo
+  A->>D: Busca al usuario por correo
+  D-->>A: Usuario y hash de contraseña
+  A->>A: Verifica la contraseña con argon2id
+  A-->>W: 200 + cookie taskflow_session (HttpOnly, SameSite=Lax)
+  Note over W,A: El navegador guarda la cookie. JavaScript no puede leerla.
+  W->>N: GET /api/tasks (el navegador envía la cookie)
+  N->>A: Reenvía (puede ser otra instancia)
+  A->>A: Verifica el token JWT y saca el userId
+  A->>D: Consulta las tareas WHERE userId = ese usuario
+  D-->>A: Tareas
+  A-->>W: 200 + JSON con las tareas del usuario

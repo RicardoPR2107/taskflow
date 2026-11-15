@@ -1,0 +1,37 @@
+flowchart LR
+  dev(["Desarrollo<br/>en mi PC"]):::actor
+
+  subgraph git["GitHub: ramas protegidas (solo por Pull Request)"]
+    direction LR
+    feat["feature/*"]:::nodo
+    develop["develop"]:::nodo
+    main["main"]:::nodo
+  end
+
+  subgraph ci["GitHub Actions (CI)"]
+    direction TB
+    c1["Calidad<br/>formato · tipos · pruebas unitarias y de API"]:::nodo
+    c2["E2E<br/>Playwright + accesibilidad"]:::nodo
+    c3["Docker<br/>3 instancias + Nginx + prueba de humo"]:::nodo
+  end
+
+  subgraph demo["Demo pública gratuita"]
+    direction TB
+    render["Render<br/>1 contenedor: Express sirve la web y la API"]:::acento
+    neon[("Neon<br/>PostgreSQL")]:::datos
+  end
+
+  dev --> feat
+  feat -- "PR + squash" --> develop
+  develop -- "PR + merge commit" --> main
+  feat -. "se ejecuta en cada PR" .-> ci
+  main -- "despliegue automático" --> render
+  render --> neon
+
+  classDef actor fill:#FBF8F1,stroke:#111111,stroke-width:2px,color:#111111
+  classDef nodo fill:#FBF8F1,stroke:#111111,stroke-width:2px,color:#111111
+  classDef acento fill:#D9541E,stroke:#111111,stroke-width:2px,color:#111111
+  classDef datos fill:#F8DCCB,stroke:#111111,stroke-width:2px,color:#111111
+  style git fill:#F3EEE3,stroke:#111111,stroke-width:2px
+  style ci fill:#F3EEE3,stroke:#111111,stroke-width:2px
+  style demo fill:#F3EEE3,stroke:#111111,stroke-width:2px
