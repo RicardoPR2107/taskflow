@@ -17,9 +17,24 @@
   --font-serif: Georgia, 'Times New Roman', ui-serif, serif;
 
   /* Sombras duras con desplazamiento: el efecto "tarjeta levantada" */
-  --shadow-hard: 4px 4px 0 0 #111111;
-  --shadow-hard-lg: 7px 7px 0 0 #111111;
-  --shadow-hard-sm: 3px 3px 0 0 #111111;
+  --shadow-hard: 4px 4px 0 0 var(--color-ink);
+  --shadow-hard-lg: 7px 7px 0 0 var(--color-ink);
+  --shadow-hard-sm: 3px 3px 0 0 var(--color-ink);
+}
+
+/*
+  Tema oscuro. Los componentes usan nombres de color y no valores fijos, así que basta con
+  redefinir los colores aquí: "ink" pasa a ser claro y "cream"/"paper" pasan a ser oscuros.
+  El naranja se oscurece un poco para que el texto claro encima siga teniendo contraste (4.7:1).
+  Lo activa public/theme-init.js (o el botón ThemeToggle) con data-theme="dark" en <html>.
+*/
+:root[data-theme='dark'] {
+  color-scheme: dark; /* campos, barras de desplazamiento y casillas nativas también en oscuro */
+  --color-cream: #151311;
+  --color-paper: #211e1a;
+  --color-ink: #f3eee3;
+  --color-orange: #b8430f;
+  --color-orange-soft: #3a2116;
 }
 
 @layer base {

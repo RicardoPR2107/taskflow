@@ -12,7 +12,7 @@ Aplicación web full stack para gestionar tareas personales con un tablero Kanba
 
 > 🌐 **Demo en vivo:** https://taskflow-lrr4.onrender.com — entra con `demo@taskflow.dev` / `Demo-Task#2026`. Es un plan gratuito: la primera visita puede tardar cerca de 1 minuto en despertar.
 
-> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros, el dashboard, la seguridad y el despliegue con Docker. Falta el tema oscuro y las pruebas de carga.
+> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros, el dashboard, la seguridad y el despliegue con Docker.
 
 ## 📦 Tecnologías
 
@@ -36,7 +36,7 @@ Lo que ya puede hacer el usuario:
 - **Ver su progreso en un dashboard**: total, pendientes, en progreso, completadas, vencidas y tasa de finalización, con gráficos por estado, por prioridad y de lo completado en los últimos 14 días.
 - **Recibir avisos** dentro de la app y ver pantallas de carga, vacío y error.
 
-Próximamente: tema claro y oscuro.
+Tema claro y oscuro: se elige con el botón de la barra superior, se recuerda y respeta el tema del sistema.
 
 ## ⌨️ Atajos de teclado
 
@@ -60,9 +60,7 @@ Todavía no hay. Por ahora, con el teclado se mueve una tarea con el selector �
 
 ## 💡 Cómo se podría mejorar
 
-- Envío real de correos para la recuperación de contraseña.
-- Notificaciones dentro de la app y modo oscuro.
-- Pruebas de carga con k6 y monitoreo con Grafana.
+- Envío real de correos para la recuperación de contraseña (hoy el flujo funciona, pero el correo está simulado).
 
 ## 🚀 Cómo ejecutarlo
 
