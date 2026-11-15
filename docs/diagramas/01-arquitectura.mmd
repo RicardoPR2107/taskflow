@@ -1,0 +1,28 @@
+flowchart LR
+  user(["Navegador<br/>(React)"]):::actor
+
+  subgraph docker["Docker Compose"]
+    direction LR
+    nginx["<b>Nginx</b><br/>sirve la web (archivos estáticos)<br/>y balancea la API con least_conn"]:::acento
+    subgraph apis["3 instancias de la API (Express)"]
+      direction TB
+      a1["api-1"]:::nodo
+      a2["api-2"]:::nodo
+      a3["api-3"]:::nodo
+    end
+    db[("PostgreSQL<br/>users · tasks · password_reset_tokens")]:::datos
+    migrate["migrate<br/>(prepara las tablas al arrancar)"]:::suave
+  end
+
+  user -- "HTTP :8080" --> nginx
+  nginx -- "/api/*  (reparte con least_conn)" --> apis
+  apis -- "Prisma" --> db
+  migrate -.-> db
+
+  classDef actor fill:#FBF8F1,stroke:#111111,stroke-width:2px,color:#111111
+  classDef nodo fill:#FBF8F1,stroke:#111111,stroke-width:2px,color:#111111
+  classDef acento fill:#D9541E,stroke:#111111,stroke-width:2px,color:#111111
+  classDef datos fill:#F8DCCB,stroke:#111111,stroke-width:2px,color:#111111
+  classDef suave fill:#F3EEE3,stroke:#111111,stroke-width:1.5px,stroke-dasharray:4 3,color:#111111
+  style docker fill:#F3EEE3,stroke:#111111,stroke-width:2px
+  style apis fill:#FBF8F1,stroke:#111111,stroke-width:1.5px
