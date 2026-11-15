@@ -12,7 +12,7 @@ Aplicación web full stack para gestionar tareas personales con un tablero Kanba
 
 > 🌐 **Demo en vivo:** https://taskflow-lrr4.onrender.com — entra con `demo@taskflow.dev` / `Demo-Task#2026`. Es un plan gratuito: la primera visita puede tardar cerca de 1 minuto en despertar.
 
-> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros, el dashboard, la seguridad y el despliegue con Docker. Falta el tema oscuro y las pruebas de carga.
+> 🚧 **Estado:** en desarrollo. Ya funcionan las cuentas, el tablero, los filtros, el dashboard, la seguridad y el despliegue con Docker.
 
 ## 📦 Tecnologías
 
@@ -36,7 +36,7 @@ Lo que ya puede hacer el usuario:
 - **Ver su progreso en un dashboard**: total, pendientes, en progreso, completadas, vencidas y tasa de finalización, con gráficos por estado, por prioridad y de lo completado en los últimos 14 días.
 - **Recibir avisos** dentro de la app y ver pantallas de carga, vacío y error.
 
-Próximamente: tema claro y oscuro.
+Tema claro y oscuro: se elige con el botón de la barra superior, se recuerda y respeta el tema del sistema.
 
 ## ⌨️ Atajos de teclado
 
@@ -60,9 +60,7 @@ Todavía no hay. Por ahora, con el teclado se mueve una tarea con el selector �
 
 ## 💡 Cómo se podría mejorar
 
-- Envío real de correos para la recuperación de contraseña.
-- Notificaciones dentro de la app y modo oscuro.
-- Pruebas de carga con k6 y monitoreo con Grafana.
+- Envío real de correos para la recuperación de contraseña (hoy el flujo funciona, pero el correo está simulado).
 
 ## 🚀 Cómo ejecutarlo
 
@@ -120,6 +118,27 @@ Las pruebas usan su propia base de datos (`taskflow_test`, se crea sola) y no to
 ## 🎥 Video
 
 _Se agregará cuando el proyecto esté terminado._
+
+## Pruebas de carga y escalabilidad
+
+Las pruebas de carga usan **k6** (genera usuarios virtuales), **Prometheus** (guarda las métricas) y **Grafana** (las muestra). La API se limita a 0.5 CPU por instancia para que una sola se sature de forma visible.
+
+```bash
+npm run load:up:1   # 1 instancia de la API
+npm run load:run    # ejecuta k6 (unos 4 minutos)
+npm run load:up:3   # 3 instancias detrás de Nginx
+npm run load:run
+npm run load:down   # apaga todo
+```
+
+Grafana queda en http://localhost:3001, en el dashboard "TaskFlow - Pruebas de carga (k6)".
+
+| Instancias de la API | p95 (peor endpoint) | Umbral p95 < 800 ms | Errores |
+| -------------------- | ------------------- | ------------------- | ------- |
+| 1                    | ≈ 1,66 s            | No cumple           | 0       |
+| 3                    | ≈ 0,62 s            | Cumple              | 0       |
+
+El p95 es el tiempo dentro del cual responde el 95 % de las peticiones. Los resultados dependen de la PC donde se ejecute, porque Docker Desktop reparte sus CPU entre todos los contenedores.
 
 ## 📄 Derechos
 

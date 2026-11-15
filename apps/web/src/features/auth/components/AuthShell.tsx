@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Footer } from '../../../shared/components/Footer';
 import { Logo } from '../../../shared/components/Logo';
 import { TaskPreviewCard } from './TaskPreviewCard';
+import { ThemeToggle } from '../../../shared/components/ThemeToggle';
 
 interface AuthShellProps {
   title: string;
@@ -14,8 +15,9 @@ interface AuthShellProps {
 export function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="mx-auto flex w-full max-w-6xl items-center px-5 py-5">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5">
         <Logo />
+        <ThemeToggle />
       </header>
 
       <main className="mx-auto grid w-full max-w-6xl flex-1 content-center items-center gap-8 px-5 pb-16 pt-2 lg:grid-cols-2 lg:gap-16 lg:pt-10">

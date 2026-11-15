@@ -5,6 +5,7 @@ import { Logo } from '../shared/components/Logo';
 import { ToastProvider } from '../shared/components/Toast';
 import { cn } from '../shared/lib/cn';
 import { useCurrentUser, useLogout } from '../features/auth/hooks';
+import { ThemeToggle } from '../shared/components/ThemeToggle';
 
 const NAV_ITEMS = [
   { to: '/tablero', label: 'Tablero' },
@@ -43,6 +44,7 @@ export function AppLayout() {
               </nav>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <span className="hidden rounded-full bg-cream px-3 py-1 text-sm font-bold sm:inline">
                 {user?.name}
               </span>

@@ -42,14 +42,14 @@ test.describe('TC-E2E-LAY: diseño y pie de página', () => {
     expect(await noHorizontalScroll(page)).toBe(true);
   });
 
-  test('TC-E2E-LAY-03 con el teclado se recorre el login en orden lógico (correo, contraseña, Mostrar, ¿Olvidaste?, enviar) y el foco se ve', async ({
+  test('TC-E2E-LAY-03 con el teclado se recorre el login en orden lógico (tema, correo, contraseña, Mostrar, ¿Olvidaste?, enviar) y el foco se ve', async ({
     page,
   }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Iniciar sesión' })).toBeVisible();
 
     const order: string[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       await page.keyboard.press('Tab');
       order.push(
         await page.evaluate(() => {
@@ -61,6 +61,7 @@ test.describe('TC-E2E-LAY: diseño y pie de página', () => {
     }
 
     expect(order.map((item) => item.split(':')[0])).toEqual([
+      'button', // boton de tema: está en el encabezado antes del formulario
       'email',
       'password',
       'button',
