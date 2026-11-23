@@ -15,10 +15,21 @@ Aplicación web full stack para gestionar tareas personales con un tablero Kanba
 
 > 🌐 **Demo en vivo:** https://taskflow-lrr4.onrender.com — entra con `demo@taskflow.dev` / `Demo-Task#2026`. Es un plan gratuito: la primera visita puede tardar cerca de 1 minuto en despertar.
 
-| Tema claro                                                    | Tema oscuro                                                     |
-| ------------------------------------------------------------- | --------------------------------------------------------------- |
-| ![Tablero en tema claro](docs/capturas/tablero-claro.png)     | ![Tablero en tema oscuro](docs/capturas/tablero-oscuro.png)     |
-| ![Dashboard en tema claro](docs/capturas/dashboard-claro.png) | ![Dashboard en tema oscuro](docs/capturas/dashboard-oscuro.png) |
+![TaskFlow en acción: iniciar sesión, mover una tarea, crear otra, buscar y filtrar, ver el dashboard y cambiar al tema oscuro](docs/capturas/taskflow-demo.gif)
+
+## 📸 Capturas
+
+| Tablero Kanban                                                       | Tablero en tema oscuro                                                                                                                                                                                              |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Tablero en tema claro](docs/capturas/tablero-claro.png)            | ![Tablero en tema oscuro](docs/capturas/tablero-oscuro.png)                                                                                                                                                         |
+| **Tareas con búsqueda y filtros**                                    | **Tareas en tema oscuro**                                                                                                                                                                                           |
+| ![Tareas en tema claro](docs/capturas/tareas-claro.png)              | ![Tareas en tema oscuro](docs/capturas/tareas-oscuro.png)                                                                                                                                                           |
+| **Dashboard**                                                        | **Dashboard en tema oscuro**                                                                                                                                                                                        |
+| ![Dashboard en tema claro](docs/capturas/dashboard-claro.png)        | ![Dashboard en tema oscuro](docs/capturas/dashboard-oscuro.png)                                                                                                                                                     |
+| **Nueva tarea**                                                      | **En el teléfono**                                                                                                                                                                                                  |
+| ![Ventana para crear una tarea](docs/capturas/nueva-tarea-claro.png) | <img src="docs/capturas/movil-tablero-claro.png" width="170" alt="Tablero en el teléfono, tema claro"> <img src="docs/capturas/movil-dashboard-oscuro.png" width="170" alt="Dashboard en el teléfono, tema oscuro"> |
+
+Las capturas y el GIF usan la cuenta de demostración con tareas de ejemplo.
 
 ## 📦 Tecnologías
 
@@ -160,10 +171,6 @@ Grafana queda en http://localhost:3001, en el dashboard “TaskFlow - Pruebas de
 | 3                    | ≈ 0,62 s            | Cumple              | 0       |
 
 El p95 es el tiempo dentro del cual responde el 95 % de las peticiones. Los resultados dependen de la PC donde se ejecute, porque Docker Desktop reparte sus CPU entre todos los contenedores.
-
-## 🎥 Video
-
-_Se agregará cuando el proyecto esté terminado._
 
 ## 📄 Derechos
 
